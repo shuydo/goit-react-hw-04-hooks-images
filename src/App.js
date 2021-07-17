@@ -30,13 +30,15 @@ export default class App extends Component {
   async componentDidUpdate(_, pState) {
     let { query, curPage, imgs } = this.state;
 
-    this.setState({ isLoading: true });
-
-    if (pState.query !== query || pState.curPage !== curPage) {
+    if (pState.query !== query) {
+      this.setState({ isLoading: true });
+      imgs = [...(await fetchPix(query, curPage))];
+      this.setState({ imgs, isLoading: false });
+    } else if (pState.curPage !== curPage) {
+      this.setState({ isLoading: true });
       imgs = [...imgs, ...(await fetchPix(query, curPage))];
+      this.setState({ imgs, isLoading: false });
     }
-
-    this.setState({ imgs, isLoading: false });
 
     window.scrollTo({
       top: document.body.scrollHeight,

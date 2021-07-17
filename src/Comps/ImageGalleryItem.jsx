@@ -15,5 +15,5 @@ export default function ImageGalleryItem({ id, url, clickOnImg }) {
 ImageGalleryItem.propTypes = {
   id: PropTypes.number.isRequired,
   url: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
+  clickOnImg: PropTypes.func.isRequired,
 };
