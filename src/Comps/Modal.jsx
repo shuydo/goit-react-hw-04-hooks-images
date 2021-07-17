@@ -1,28 +1,31 @@
-import { Component } from "react";
+import { useEffect } from "react";
 import PropTypes from "prop-types";
 
-export default class Modal extends Component {
-  componentDidMount() {
-    window.addEventListener("keydown", this.handleKeyDown);
-  }
-  componentWillUnmount() {
-    window.removeEventListener("keydown", this.handleKeyDown);
-  }
-  handleKeyDown = (e) => {
-    if (e.code === "Escape") this.props.onClose();
+export default function Modal({ urlBigImg, onClose }) {
+  const handleKeyDown = (e) => {
+    if (e.code === "Escape") onClose();
   };
-  handleClickOnBD = (e) => {
-    if (e.target === e.currentTarget) this.props.onClose();
+
+  const handleClickOnBD = (e) => {
+    if (e.target === e.currentTarget) onClose();
   };
-  render() {
-    return (
-      <div className="Overlay" onClick={this.handleClickOnBD}>
-        <div className="Modal">
-          <img src={this.props.urlBigImg} alt="oversize" />
-        </div>
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    document.body.classList.toggle("no-scroll");
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.classList.toggle("no-scroll");
+    };
+  });
+
+  return (
+    <div className="Overlay" onClick={handleClickOnBD}>
+      <div className="Modal">
+        <img src={urlBigImg} alt="oversize" />
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 Modal.propTypes = {

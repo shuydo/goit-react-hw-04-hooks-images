@@ -1,82 +1,68 @@
-import React, { Component } from "react"; // import axios from "axios";
+import React, { useEffect, useState } from "react"; // import axios from "axios";
 import Loader from "react-loader-spinner"; // import { ToastContainer } from "react-toastify";
-import fetchPix from "./js/Api";
 
+import fetchPix from "./js/Api";
 import Searchbar from "./Comps/Searchbar"; // import "react-toastify/dist/ReactToastify.css";
 import ImageGallery from "./Comps/ImageGallery";
 import Modal from "./Comps/Modal";
-
 import Button from "./Comps/Button";
 
-export default class App extends Component {
-  state = {
-    query: null,
-    curPage: 1,
-    imgs: [],
-    modalImgId: null,
-    showM: false,
-    isLoading: false,
+export default function App() {
+  const [query, setQuery] = useState(null);
+  const [curPage, setCurPage] = useState(1);
+  const [imgs, setImgs] = useState([]);
+  const [modalImgId, setModalImgId] = useState(null);
+  const [showM, setShowM] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const toggleModal = () => setShowM(!showM);
+  const handleMore = () => setCurPage((oldS) => oldS + 1);
+
+  const toSearch = (id) => {
+    return imgs[imgs.map((el) => el.id).indexOf(id)].largeImageURL;
+  }; // return url big img by id (take from DOM by click on gall)
+
+  const handleTakeID = (e) => {
+    setModalImgId(+e.target.id);
+    toggleModal();
   };
 
-  handleSubmit = (query) => this.setState({ query, curPage: 1 });
-  toggleModal = () => this.setState({ showM: !this.state.showM });
-  handleMore = () => this.setState(({ curPage }) => ({ curPage: curPage + 1 }));
-
-  handleTakeID = (e) => {
-    this.setState({ modalImgId: +e.target.id });
-    this.toggleModal();
+  const handleSubmit = (query) => {
+    setQuery(query);
+    setCurPage(1);
+    setImgs([]);
   };
 
-  async componentDidUpdate(_, pState) {
-    let { query, curPage, imgs } = this.state;
-
-    if (pState.query !== query) {
-      this.setState({ isLoading: true });
-      imgs = [...(await fetchPix(query, curPage))];
-      this.setState({ imgs, isLoading: false });
-    } else if (pState.curPage !== curPage) {
-      this.setState({ isLoading: true });
-      imgs = [...imgs, ...(await fetchPix(query, curPage))];
-      this.setState({ imgs, isLoading: false });
+  useEffect(() => {
+    if (!query) {
+      return;
     }
 
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: "smooth",
-    }); // console.log("final cDU");
-  }
+    setIsLoading(true);
+    fetchPix(query, curPage).then((r) => setImgs((oldS) => [...oldS, ...r]));
+    setIsLoading(false);
+  }, [query, curPage]);
 
-  render() {
-    // const notify = () => toast("Wow so easy!");
-    const { state, handleTakeID, handleMore, toggleModal } = this;
-    const { imgs, isLoading, showM, modalImgId } = state;
-    const toSearch = (id) => {
-      return imgs[imgs.map((el) => el.id).indexOf(id)].largeImageURL;
-    }; // return big img url by id (take from DOM by click on screen)
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth",
+  }); // const notify = () => toast("Wow so easy!");
 
-    return (
-      <div className="App">
-        {isLoading && (
-          <Loader
-            className="Loader"
-            type="Watch"
-            // type="ThreeDots" color="red" color="#00BFFF" height={100} width={100} timeout={3000} 303f9f
-            // Audio Watch Triangle BallTriangle Bars Circles Grid Hearts Oval Puff Rings TailSpin ThreeDots RevolvingDot MutatingDots
-          />
-        )}
-        {/* <button onClick={notify}>Notify!</button>  */}
-        <Searchbar onSubmitDo={(query) => this.setState({ query })} />
-        {!isLoading && imgs.length > 0 && (
-          <>
-            <ImageGallery imgs={imgs} clickOnGall={handleTakeID} />
-            <Button onClick={handleMore} />
-          </>
-        )}
-        {showM && (
-          <Modal urlBigImg={toSearch(modalImgId)} onClose={toggleModal} />
-        )}{" "}
-        {/* <ToastContainer /> */}
-      </div>
-    );
-  }
-} // <Searchbar> <ImageGallery> <ImageGalleryItem> <Loader> <Button> <Modal>
+  return (
+    <div className="App">
+      {isLoading && <Loader className="Loader" type="Watch" />}
+      {/* <button onClick={notify}>Notify!</button>  */}
+      <Searchbar onSubmitDo={handleSubmit} />
+      {!isLoading && imgs.length > 0 && (
+        <>
+          <ImageGallery imgs={imgs} clickOnGall={handleTakeID} />
+          <Button onClick={handleMore} />
+        </>
+      )}
+      {showM && (
+        <Modal urlBigImg={toSearch(modalImgId)} onClose={toggleModal} />
+      )}{" "}
+      {/* <ToastContainer /> */}
+    </div>
+  );
+}

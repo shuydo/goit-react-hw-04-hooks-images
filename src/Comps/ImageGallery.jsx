@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
-
 import ImageGalleryItem from "./ImageGalleryItem";
+
 export default function ImageGallery({ imgs, clickOnGall }) {
   // console.log(clickOnGall);
   return (
@@ -23,8 +23,7 @@ ImageGallery.propTypes = {
     PropTypes.shape({
       id: PropTypes.number,
       webformatURL: PropTypes.string,
-      // largeImageURL: PropTypes.string,
-      // tags: PropTypes.string,
+      largeImageUrl: PropTypes.string,
     })
   ),
   clickOnGall: PropTypes.func.isRequired,

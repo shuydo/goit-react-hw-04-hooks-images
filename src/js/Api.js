@@ -5,12 +5,8 @@ const KEY = "21031732-6fee4eefe658f550324b0a29e"; // pPage 200(20)
 const constURL = `${URL}photo&orientation=horizontal&key=${KEY}&per_page=12&q=`;
 
 const fKeys = (arr) => {
-  return arr.map((el) => {
-    return {
-      id: el.id,
-      webformatURL: el.webformatURL,
-      largeImageURL: el.largeImageURL,
-    };
+  return arr.map(({ id, webformatURL, largeImageURL }) => {
+    return { id, webformatURL, largeImageURL };
   });
 };
 
